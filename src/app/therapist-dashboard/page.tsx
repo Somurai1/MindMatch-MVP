@@ -32,26 +32,6 @@ export default function TherapistDashboard() {
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Check if user has therapist access
-  if (!user || profile?.role !== 'therapist') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-white shadow-lg rounded-lg p-8 text-center">
-            <ExclamationTriangleIcon className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to access the therapist dashboard.</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  useEffect(() => {
-    loadTherapistData()
-  }, [user])
-
   const loadTherapistData = async () => {
     try {
       // Load therapist profile
@@ -110,6 +90,26 @@ export default function TherapistDashboard() {
       setLoading(false)
     }
   }
+
+  // Check if user has therapist access
+  if (!user || profile?.role !== 'therapist') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-white shadow-lg rounded-lg p-8 text-center">
+            <ExclamationTriangleIcon className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+            <p className="text-gray-600">You don't have permission to access the therapist dashboard.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  useEffect(() => {
+    loadTherapistData()
+  }, [user])
 
   const handleAcceptReferral = async (referralId: string) => {
     try {
