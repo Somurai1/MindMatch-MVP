@@ -375,7 +375,7 @@ export default function TherapistsPage() {
                     <div className="w-24">
                       <label className="flex items-center">
                         <input
-                          {...register(`availability.${day}.available`)}
+                          {...register(`availability.${day}.available` as any)}
                           type="checkbox"
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
@@ -386,13 +386,13 @@ export default function TherapistsPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
-                        {...register(`availability.${day}.start`)}
+                        {...register(`availability.${day}.start` as any)}
                         type="time"
                         className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                       <span className="text-gray-500">to</span>
                       <input
-                        {...register(`availability.${day}.end`)}
+                        {...register(`availability.${day}.end` as any)}
                         type="time"
                         className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />

@@ -33,6 +33,8 @@ export default function TherapistDashboard() {
   const [loading, setLoading] = useState(true)
 
   const loadTherapistData = async () => {
+    if (!user) return
+    
     try {
       // Load therapist profile
       const { data: therapistData } = await supabase
@@ -183,7 +185,7 @@ export default function TherapistDashboard() {
             <p className="text-gray-600 mb-6">Your therapist profile is currently under review by our clinical team. You'll receive an email once verification is complete.</p>
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <p className="text-yellow-800 text-sm">
-                <strong>Status:</strong> Pending verification<br>
+                <strong>Status:</strong> Pending verification<br />
                 <strong>Submitted:</strong> {new Date(therapist.created_at).toLocaleDateString()}
               </p>
             </div>
@@ -247,7 +249,7 @@ export default function TherapistDashboard() {
 
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex items-center">
-                <CheckCircleIcon className="h-8 w-8 text-green-600" />
+                <ChartBarIcon className="h-8 w-8 text-indigo-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Completed Sessions</p>
                   <p className="text-2xl font-semibold text-gray-900">{stats.completedSessions}</p>
@@ -257,7 +259,7 @@ export default function TherapistDashboard() {
 
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex items-center">
-                <CalendarIcon className="h-8 w-8 text-blue-600" />
+                <ClockIcon className="h-8 w-8 text-orange-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Upcoming Sessions</p>
                   <p className="text-2xl font-semibold text-gray-900">{stats.upcomingSessions}</p>
@@ -267,135 +269,93 @@ export default function TherapistDashboard() {
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Recent Referrals */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Recent Referrals</h3>
-            </div>
-            <div className="p-6">
-              {recentReferrals.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No referrals yet</p>
-              ) : (
-                <div className="space-y-4">
-                  {recentReferrals.map((referral) => (
-                    <div key={referral.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{referral.client_name}</h4>
-                          <p className="text-sm text-gray-600">Age: {referral.client_age}</p>
-                          <p className="text-sm text-gray-600">{referral.issue_type}</p>
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-2 ${
-                            referral.urgency === 'crisis' ? 'bg-red-100 text-red-800' :
-                            referral.urgency === 'high' ? 'bg-orange-100 text-orange-800' :
-                            referral.urgency === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {referral.urgency}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">
-                            {new Date(referral.created_at).toLocaleDateString()}
-                          </p>
-                          {referral.status === 'matched' && (
-                            <button
-                              onClick={() => handleAcceptReferral(referral.id)}
-                              className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                            >
-                              Accept
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* Recent Referrals */}
+        <div className="bg-white rounded-lg shadow mb-8">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Referrals</h2>
           </div>
-
-          {/* Upcoming Sessions */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Upcoming Sessions</h3>
-            </div>
-            <div className="p-6">
-              {upcomingBookings.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No upcoming sessions</p>
-              ) : (
-                <div className="space-y-4">
-                  {upcomingBookings.map((booking) => (
-                    <div key={booking.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-900">
-                            {new Date(booking.scheduled_date).toLocaleDateString()}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {new Date(booking.scheduled_date).toLocaleTimeString()}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Duration: {booking.duration_minutes} minutes
-                          </p>
-                          <p className="text-sm text-gray-600 capitalize">
-                            {booking.modality.replace('_', ' ')}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                            {booking.status}
-                          </span>
-                          {booking.meeting_link && (
-                            <a
-                              href={booking.meeting_link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block mt-2 text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              Join Session
-                            </a>
-                          )}
-                        </div>
-                      </div>
+          <div className="p-6">
+            {recentReferrals.length > 0 ? (
+              <div className="space-y-4">
+                {recentReferrals.map((referral) => (
+                  <div key={referral.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-gray-900">{referral.client_name}</h3>
+                      <p className="text-sm text-gray-600">{referral.client_age} years old</p>
+                      <p className="text-sm text-gray-500">{referral.urgency}</p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <div className="flex space-x-2">
+                      {referral.status === 'matched' && (
+                        <button
+                          onClick={() => handleAcceptReferral(referral.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Accept
+                        </button>
+                      )}
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        referral.status === 'matched' ? 'bg-yellow-100 text-yellow-800' :
+                        referral.status === 'booked' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {referral.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No recent referrals</p>
+            )}
           </div>
         </div>
 
-        {/* Profile Summary */}
-        <div className="mt-8 bg-white shadow rounded-lg">
+        {/* Upcoming Bookings */}
+        <div className="bg-white rounded-lg shadow mb-8">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Your Profile</h3>
+            <h2 className="text-lg font-semibold text-gray-900">Upcoming Bookings</h2>
           </div>
           <div className="p-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            {upcomingBookings.length > 0 ? (
+              <div className="space-y-4">
+                {upcomingBookings.map((booking) => (
+                  <div key={booking.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-gray-900">Scheduled Session</h3>
+                      <p className="text-sm text-gray-600">
+                        {new Date(booking.scheduled_date).toLocaleDateString()} at {new Date(booking.scheduled_date).toLocaleTimeString()}
+                      </p>
+                      <p className="text-sm text-gray-500">{booking.modality} session</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      booking.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {booking.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">No upcoming bookings</p>
+            )}
+          </div>
+        </div>
+
+        {/* Profile Information */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Specializations</h4>
-                <div className="flex flex-wrap gap-2">
-                  {therapist.specializations.map((spec) => (
-                    <span key={spec} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                      {spec}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-gray-600">{therapist.specializations?.join(', ') || 'Not specified'}</p>
               </div>
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Languages</h4>
-                <div className="flex flex-wrap gap-2">
-                  {therapist.languages.map((lang) => (
-                    <span key={lang} className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
-                      {lang}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-2">Hourly Rate</h4>
-                <p className="text-gray-600">€{therapist.hourly_rate}/hour</p>
+                <h4 className="font-medium text-gray-900 mb-2">Qualifications</h4>
+                <p className="text-gray-600">{therapist.qualifications?.join(', ') || 'Not specified'}</p>
               </div>
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">License Number</h4>
